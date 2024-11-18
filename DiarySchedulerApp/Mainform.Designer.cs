@@ -64,6 +64,7 @@ namespace DiarySchedulerApp
             this.btnCancel.TabIndex = 37;
             this.btnCancel.Text = "Скасувати";
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // btnSave
             // 
@@ -266,7 +267,7 @@ namespace DiarySchedulerApp
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnSave);
             this.Name = "MainForm";
-            this.Text = " Додати нову подію";
+            this.Text = " Додати/редагувати подію";
             ((System.ComponentModel.ISupportInitialize)(this.numDurationHours)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numDurationMinutes)).EndInit();
             this.groupBox1.ResumeLayout(false);

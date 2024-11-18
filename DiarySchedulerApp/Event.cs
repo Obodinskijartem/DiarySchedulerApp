@@ -6,52 +6,112 @@ using System.Threading.Tasks;
 
 namespace DiarySchedulerApp
 {
-    public class Event : IComparable<Event>
+
+    public class Event
     {
+        // Поля
         private string date;
         private string time;
-        private int duration;
+        private int durationHours;
+        private int durationMinutes;
         private string location;
-        private string reminder;
+        private bool enableReminder;
+        private string reminderTime;
         private string description;
-        internal int DurationHours;
-        internal int DurationMinutes;
-        internal bool EnableReminder;
-        internal string ReminderTime;
 
-        public string Date { get => date; set => date = value; }
-        public string Time { get => time; set => time = value; }
-        public int Duration { get => duration; set => duration = value; }
-        public string Location { get => location; set => location = value; }
-        public string Reminder { get => reminder; set => reminder = value; }
-        public string Description { get => description; set => description = value; }
+        // Властивості
+        public string Date
+        {
+            get => date;
+            set
+            {
+                if (DateTime.TryParse(value, out _))
+                    date = value;
+                else
+                    throw new ArgumentException("Невірний формат дати.");
+            }
+        }
 
+        public string Time
+        {
+            get => time;
+            set
+            {
+                if (TimeSpan.TryParse(value, out _))
+                    time = value;
+                else
+                    throw new ArgumentException("Невірний формат часу.");
+            }
+        }
+
+        public int DurationHours
+        {
+            get => durationHours;
+            set
+            {
+                if (value >= 0)
+                    durationHours = value;
+                else
+                    throw new ArgumentException("Тривалість у годинах не може бути від'ємною.");
+            }
+        }
+
+        public int DurationMinutes
+        {
+            get => durationMinutes;
+            set
+            {
+                if (value >= 0 && value < 60)
+                    durationMinutes = value;
+                else
+                    throw new ArgumentException("Тривалість у хвилинах має бути в межах від 0 до 59.");
+            }
+        }
+
+        public string Location
+        {
+            get => location;
+            set => location = string.IsNullOrWhiteSpace(value) ? "Невідомо" : value;
+        }
+
+        public bool EnableReminder
+        {
+            get => enableReminder;
+            set => enableReminder = value;
+        }
+
+        public string ReminderTime
+        {
+            get => reminderTime;
+            set => reminderTime = string.IsNullOrWhiteSpace(value) ? "Без нагадування" : value;
+        }
+
+        public string Description
+        {
+            get => description;
+            set => description = string.IsNullOrWhiteSpace(value) ? "Без опису" : value;
+        }
+
+        // Конструктори
         public Event() { }
 
-        public Event(string date, string time, int duration, string location, string reminder, string description)
+        public Event(string date, string time, int durationHours, int durationMinutes, string location, bool enableReminder, string reminderTime, string description)
         {
             Date = date;
             Time = time;
-            Duration = duration;
+            DurationHours = durationHours;
+            DurationMinutes = durationMinutes;
             Location = location;
-            Reminder = reminder;
+            EnableReminder = enableReminder;
+            ReminderTime = reminderTime;
             Description = description;
         }
 
-        public override string ToString()
+        // Віртуальний метод для отримання деталей події
+        public virtual string GetEventDetails()
         {
-            return $"{Date};{Time};{Duration};{Location};{Reminder};{Description}";
-        }
-
-        public static Event Parse(string data)
-        {
-            var parts = data.Split(';');
-            return new Event(parts[0], parts[1], int.Parse(parts[2]), parts[3], parts[4], parts[5]);
-        }
-
-        public int CompareTo(Event other)
-        {
-            return DateTime.Parse($"{Date} {Time}").CompareTo(DateTime.Parse($"{other.Date} {other.Time}"));
+            return $"Дата: {Date}, Час: {Time}, Тривалість: {DurationHours} год {DurationMinutes} хв, Місце: {Location}, " +
+                   $"Опис: {Description}, Нагадування: {(EnableReminder ? "увімкнене" : "вимкнене")}, Час нагадування: {ReminderTime}";
         }
     }
 }

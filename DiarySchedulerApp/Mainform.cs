@@ -12,24 +12,23 @@ namespace DiarySchedulerApp
 {
     public partial class MainForm : Form
     {
-        private string[] entryData;
+        private Event eventData;
 
-        // Конструктор для додавання
+        // Конструктор для додавання нового запису
         public MainForm()
         {
             InitializeComponent();
             InitializeForm();
-            entryData = new string[6];
+            eventData = new Event(); // Створення нового об'єкта
         }
 
-        // Конструктор для редагування
-        public MainForm(string[] existingEntry)
+        // Конструктор для редагування існуючого запису
+        public MainForm(Event existingEvent)
         {
             InitializeComponent();
             InitializeForm();
-
-            entryData = existingEntry;
-            LoadEntryData();
+            eventData = existingEvent;
+            LoadEventData(); // Завантаження даних у форму
         }
 
         private void InitializeForm()
@@ -38,37 +37,39 @@ namespace DiarySchedulerApp
             cmbReminderTime.SelectedIndex = 0; // Значення за замовчуванням
         }
 
-        // Завантаження даних у поля форми
-        private void LoadEntryData()
+        private void LoadEventData()
         {
-            datePickerEvent.Value = DateTime.Parse(entryData[0]);
-            timePickerEvent.Value = DateTime.Parse(entryData[1]);
-            numDurationHours.Value = int.Parse(entryData[2].Split(' ')[0]);
-            numDurationMinutes.Value = int.Parse(entryData[2].Split(' ')[2]);
-            txtLocation.Text = entryData[3];
-            cmbReminderTime.SelectedItem = entryData[4];
-            txtDescription.Text = entryData[5];
+            datePickerEvent.Value = DateTime.Parse(eventData.Date);
+            timePickerEvent.Value = DateTime.Parse(eventData.Time);
+            numDurationHours.Value = eventData.DurationHours;
+            numDurationMinutes.Value = (decimal)eventData.DurationMinutes;
+            txtLocation.Text = eventData.Location;
+            chkReminder.Checked = eventData.EnableReminder;
+            cmbReminderTime.SelectedItem = eventData.ReminderTime;
+            txtDescription.Text = eventData.Description;
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            // Збираємо дані з форми
-            string date = datePickerEvent.Value.ToShortDateString();
-            string time = timePickerEvent.Value.ToShortTimeString();
-            string duration = $"{numDurationHours.Value} год {numDurationMinutes.Value} хв";
-            string location = txtLocation.Text;
-            string reminder = chkReminder.Checked ? cmbReminderTime.SelectedItem.ToString() : "Немає";
-            string description = txtDescription.Text;
-
-            // Перевірка полів
-            if (string.IsNullOrWhiteSpace(location))
+            // Перевірка обов'язкових полів
+            if (string.IsNullOrWhiteSpace(txtLocation.Text))
             {
-                MessageBox.Show("Будь ласка, заповніть поле 'Місце проведення'.");
+                MessageBox.Show("Поле 'Місце проведення' обов'язкове для заповнення.");
                 return;
             }
 
-            // Записуємо дані
-            entryData = new string[] { date, time, duration, location, reminder, description };
+
+
+            // Збереження даних у об'єкт
+            eventData.Date = datePickerEvent.Value.ToShortDateString();
+            eventData.Time = timePickerEvent.Value.ToShortTimeString();
+            eventData.DurationHours = (int)numDurationHours.Value;
+            eventData.DurationMinutes = (int)numDurationMinutes.Value;
+            eventData.Location = txtLocation.Text.Trim();
+            eventData.EnableReminder = chkReminder.Checked;
+            eventData.ReminderTime = chkReminder.Checked ? cmbReminderTime.SelectedItem.ToString() : "Немає";
+            eventData.Description = txtDescription.Text.Trim();
+
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
@@ -76,12 +77,14 @@ namespace DiarySchedulerApp
         private void btnCancel_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;
+
             this.Close();
         }
 
-        public string[] GetEntry()
+        public Event GetEvent()
         {
-            return entryData;
+            return eventData;
         }
+
     }
 }
